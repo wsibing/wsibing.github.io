@@ -1,121 +1,208 @@
 /*
-	Prologue by HTML5 UP
+	Paradigm Shift by HTML5 UP
 	html5up.net | @ajlkn
 	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
 */
 
 (function($) {
 
-	skel.breakpoints({
-		wide: '(min-width: 961px) and (max-width: 1880px)',
-		normal: '(min-width: 961px) and (max-width: 1620px)',
-		narrow: '(min-width: 961px) and (max-width: 1320px)',
-		narrower: '(max-width: 960px)',
-		mobile: '(max-width: 736px)'
-	});
+	var	$window = $(window),
+		$body = $('body');
 
-	$(function() {
+	// Breakpoints.
+		breakpoints({
+			default:   ['1681px',   null       ],
+			xlarge:    ['1281px',   '1680px'   ],
+			large:     ['981px',    '1280px'   ],
+			medium:    ['737px',    '980px'    ],
+			small:     ['481px',    '736px'    ],
+			xsmall:    ['361px',    '480px'    ],
+			xxsmall:   [null,       '360px'    ]
+		});
 
-		var	$window = $(window),
-			$body = $('body');
+	// Play initial animations on page load.
+		$window.on('load', function() {
+			window.setTimeout(function() {
+				$body.removeClass('is-preload');
+			}, 100);
+		});
 
-		// Disable animations/transitions until the page has loaded.
-			$body.addClass('is-loading');
+	// Hack: Enable IE workarounds.
+		if (browser.name == 'ie')
+			$body.addClass('is-ie');
 
-			$window.on('load', function() {
-				$body.removeClass('is-loading');
+	// Mobile?
+		if (browser.mobile)
+			$body.addClass('is-mobile');
+
+	// Scrolly.
+		$('.scrolly')
+			.scrolly({
+				offset: 100
 			});
 
-		// CSS polyfills (IE<9).
-			if (skel.vars.IEVersion < 9)
-				$(':last-child').addClass('last-child');
+	// Polyfill: Object fit.
+		if (!browser.canUse('object-fit')) {
 
-		// Fix: Placeholder polyfill.
-			$('form').placeholder();
+			$('.image[data-position]').each(function() {
 
-		// Prioritize "important" elements on mobile.
-			skel.on('+mobile -mobile', function() {
-				$.prioritize(
-					'.important\\28 mobile\\29',
-					skel.breakpoint('mobile').active
-				);
+				var $this = $(this),
+					$img = $this.children('img');
+
+				// Apply img as background.
+					$this
+						.css('background-image', 'url("' + $img.attr('src') + '")')
+						.css('background-position', $this.data('position'))
+						.css('background-size', 'cover')
+						.css('background-repeat', 'no-repeat');
+
+				// Hide img.
+					$img
+						.css('opacity', '0');
+
 			});
 
-		// Scrolly links.
-			$('.scrolly').scrolly();
+			$('.gallery > a').each(function() {
 
-		// Nav.
-			var $nav_a = $('#nav a.scrolly');
+				var $this = $(this),
+					$img = $this.children('img');
 
-			// Scrolly-fy links.
-				if($nav_a.scrolly()){
-					$nav_a
-						.scrolly()
-						.on('click', function(e) {
+				// Apply img as background.
+					$this
+						.css('background-image', 'url("' + $img.attr('src') + '")')
+						.css('background-position', 'center')
+						.css('background-size', 'cover')
+						.css('background-repeat', 'no-repeat');
 
-							var t = $(this),
-								href = t.attr('href');
+				// Hide img.
+					$img
+						.css('opacity', '0');
 
-							if (href[0] != '#')
-								return;
+			});
 
-							e.preventDefault();
+		}
 
-							// Clear active and lock scrollzer until scrolling has stopped
-								$nav_a
-									.removeClass('active')
-									.addClass('scrollzer-locked');
+	// Gallery.
+		$('.gallery')
+			.on('click', 'a', function(event) {
 
-							// Set this link to active
-								t.addClass('active');
+				var $a = $(this),
+					$gallery = $a.parents('.gallery'),
+					$modal = $gallery.children('.modal'),
+					$modalImg = $modal.find('img'),
+					href = $a.attr('href');
 
-						});
-				}
-
-			// Initialize scrollzer.
-				var ids = [];
-
-				$nav_a.each(function() {
-
-					var href = $(this).attr('href');
-
-					if (href[0] != '#')
+				// Not an image? Bail.
+					if (!href.match(/\.(jpg|gif|png|mp4)$/))
 						return;
 
-					ids.push(href.substring(1));
+				// Prevent default.
+					event.preventDefault();
+					event.stopPropagation();
 
-				});
+				// Locked? Bail.
+					if ($modal[0]._locked)
+						return;
 
-				$.scrollzer(ids, { pad: 200, lastHack: true });
+				// Lock.
+					$modal[0]._locked = true;
 
-		// Header (narrower + mobile).
+				// Set src.
+					$modalImg.attr('src', href);
 
-			// Toggle.
-				$(
-					'<div id="headerToggle">' +
-						'<a href="#header" class="toggle"></a>' +
-					'</div>'
-				)
-					.appendTo($body);
+				// Set visible.
+					$modal.addClass('visible');
 
-			// Header.
-				$('#header')
-					.panel({
-						delay: 500,
-						hideOnClick: true,
-						hideOnSwipe: true,
-						resetScroll: true,
-						resetForms: true,
-						side: 'left',
-						target: $body,
-						visibleClass: 'header-visible'
+				// Focus.
+					$modal.focus();
+
+				// Delay.
+					setTimeout(function() {
+
+						// Unlock.
+							$modal[0]._locked = false;
+
+					}, 600);
+
+			})
+			.on('click', '.modal', function(event) {
+
+				var $modal = $(this),
+					$modalImg = $modal.find('img');
+
+				// Locked? Bail.
+					if ($modal[0]._locked)
+						return;
+
+				// Already hidden? Bail.
+					if (!$modal.hasClass('visible'))
+						return;
+
+				// Stop propagation.
+					event.stopPropagation();
+
+				// Lock.
+					$modal[0]._locked = true;
+
+				// Clear visible, loaded.
+					$modal
+						.removeClass('loaded')
+
+				// Delay.
+					setTimeout(function() {
+
+						$modal
+							.removeClass('visible')
+
+						setTimeout(function() {
+
+							// Clear src.
+								$modalImg.attr('src', '');
+
+							// Unlock.
+								$modal[0]._locked = false;
+
+							// Focus.
+								$body.focus();
+
+						}, 475);
+
+					}, 125);
+
+			})
+			.on('keypress', '.modal', function(event) {
+
+				var $modal = $(this);
+
+				// Escape? Hide modal.
+					if (event.keyCode == 27)
+						$modal.trigger('click');
+
+			})
+			.on('mouseup mousedown mousemove', '.modal', function(event) {
+
+				// Stop propagation.
+					event.stopPropagation();
+
+			})
+			.prepend('<div class="modal" tabIndex="-1"><div class="inner"><img src="" /></div></div>')
+				.find('img')
+					.on('load', function(event) {
+
+						var $modalImg = $(this),
+							$modal = $modalImg.parents('.modal');
+
+						setTimeout(function() {
+
+							// No longer visible? Bail.
+								if (!$modal.hasClass('visible'))
+									return;
+
+							// Set loaded.
+								$modal.addClass('loaded');
+
+						}, 275);
+
 					});
-
-			// Fix: Remove transitions on WP<10 (poor/buggy performance).
-				if (skel.vars.os == 'wp' && skel.vars.osVersion < 10)
-					$('#headerToggle, #header, #main')
-						.css('transition', 'none');
-
-	});
 
 })(jQuery);
