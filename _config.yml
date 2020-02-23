@@ -13,10 +13,10 @@
 # you will see them accessed via {{ site.title }}, {{ site.email }}, and so on.
 # You can create any custom variable you would like, and they will be accessible
 # in the templates via {{ site.myvariable }}.
-title: Wang
+title: CUG
 description: > # this means to ignore newlines until "baseurl:"
   Material theme based on <a href="http://materializecss.com">Materialize.css</a> for jekyll sites
-baseurl: "/wang"
+baseurl: "/wsibing.github.io"
 url: "https://wsibing.github.io/"
 permalink: /:year/:month/:day/:title
 repository: wsibing/wsibing.github.io
@@ -24,8 +24,8 @@ paginate: 5
 
 # wang specific configurations
 github_profile: "https://wsibing.github.io/"
-user: "John Doe"
-user_email: "john@doe.com"
+user: "CUG wang"
+user_email: "wsibing@cug.edu.cn"
 contact_url: "https://goo.gl/tVljbV"
 google_tracking_id: "UA-96359860-1"
 google_site_verification: "UA-96359860-1"
