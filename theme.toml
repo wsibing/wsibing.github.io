@@ -1,4 +1,4 @@
-name = "Herring Cove"
+name = "王思兵"
 description = "Herring Cove is ported from the jekyll theme of the same name"
 license = "MIT"
 tags = ["blog", "company"]
@@ -6,9 +6,9 @@ min_version = 0.20
 
 [author]
     name = "spf13"
-    homepage = "http://spf13.com"
+    homepage = "https://wsibing.github.io/"
 
 # If Porting existing theme
 [original]
     author =  "arnp"
-    repo = "http://www.github.com/arnp/herring-cove"
+    repo = "https://wsibing.github.io/"
